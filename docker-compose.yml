@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+  takemewith-backend:
+    image: takemewith-backend:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: takemewith-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://takemewith-mysql:3306/take?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: jacek
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_DATABASE-PLATFORM: org.hibernate.dialect.MySQL8Dialect
+    depends_on:
+      - mysql
+    networks:
+      - takemewith-net
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: takemewith-mysql
+    ports:
+      - "3307:3306"
+    volumes:
+      - takemewith-mysql-data:/var/lib/mysql
+    networks:
+      - takemewith-net
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      interval: 1m
+      timeout: 10s
+      retries: 2
+
+volumes:
+  takemewith-mysql-data:
+
+networks:
+  takemewith-net:
+    name: takemewith-net
+
