@@ -1,7 +1,7 @@
 package codepred.rate.service;
 
 import codepred.enums.ResponseStatus;
-import codepred.rate.dto.RateDTO;
+import codepred.rate.dto.RateDto;
 import codepred.rate.dto.ResponseObj;
 import codepred.rate.model.RateModel;
 import codepred.rate.repository.RateRepository;
@@ -17,18 +17,19 @@ import static codepred.enums.ResponseStatus.BAD_REQUEST;
 @Service
 @RequiredArgsConstructor
 public class RateService {
+
     private final RateRepository rateRepository;
     private final ModelMapper modelMapper;
 
     @Transactional
-    public ResponseObj addRating(RateDTO rateDTO) {
-        var rateModel = modelMapper.map(rateDTO, RateModel.class);
+    public ResponseObj addRating(RateDto rateDto) {
+        var rateModel = modelMapper.map(rateDto, RateModel.class);
         rateRepository.save(rateModel);
         return new ResponseObj(ACCEPTED, "ADDED");
     }
 
     @Transactional
-    public ResponseObj editRating(Long id, RateDTO rateDTO) {
+    public ResponseObj editRating(Long id, RateDto rateDTO) {
         if (isIdExist(id)) {
             var rateModel = modelMapper.map(rateDTO, RateModel.class);
             rateModel.setId(id);

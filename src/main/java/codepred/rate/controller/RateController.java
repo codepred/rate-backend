@@ -1,7 +1,7 @@
 package codepred.rate.controller;
 
 import codepred.enums.ResponseStatus;
-import codepred.rate.dto.RateDTO;
+import codepred.rate.dto.RateDto;
 import codepred.rate.dto.ResponseObj;
 import codepred.rate.service.RateService;
 import lombok.RequiredArgsConstructor;
@@ -12,54 +12,57 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/rating")
 @RequiredArgsConstructor
 public class RateController {
+
     private final RateService rateService;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addRating(@RequestBody RateDTO rateDTO) {
-        if(isNullName(rateDTO)){
+    ResponseEntity<Object> addRating(@RequestBody RateDto rateDTO) {
+        if (isNullName(rateDTO)) {
             return ResponseEntity.status(rateService.getResponseCode(ResponseStatus.BAD_REQUEST))
-                    .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "NAME_IS_NULL"));
+                .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "NAME_IS_NULL"));
         }
         if (isNameBlank(rateDTO)) {
             return ResponseEntity.status(rateService.getResponseCode(ResponseStatus.BAD_REQUEST))
-                    .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "NAME_IS_BLANK"));
+                .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "NAME_IS_BLANK"));
         }
         return ResponseEntity.ok(rateService.addRating(rateDTO));
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<Object> editRating(@RequestBody Long id, RateDTO rateDTO) {
-        if(isNullName(rateDTO)){
+    ResponseEntity<Object> editRating(@PathVariable("id") Long id, @RequestBody RateDto rateDTO) {
+        if (isNullName(rateDTO)) {
             return ResponseEntity.status(rateService.getResponseCode(ResponseStatus.BAD_REQUEST))
-                    .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "NAME_IS_NULL"));
+                .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "NAME_IS_NULL"));
         }
-        if(isNullId(id)){
+        if (isNullId(id)) {
             return ResponseEntity.status(rateService.getResponseCode(ResponseStatus.BAD_REQUEST))
-                    .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "ID_IS_NULL"));
+                .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "ID_IS_NULL"));
         }
         if (isNameBlank(rateDTO)) {
             return ResponseEntity.status(rateService.getResponseCode(ResponseStatus.BAD_REQUEST))
-                    .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "NAME_IS_BLANK"));
+                .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "NAME_IS_BLANK"));
         }
         return ResponseEntity.ok(rateService.editRating(id, rateDTO));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteRating(@RequestBody Long id) {
-        if(isNullId(id)){
+    ResponseEntity<Object> deleteRating(@PathVariable("id") Long id) {
+        if (isNullId(id)) {
             return ResponseEntity.status(rateService.getResponseCode(ResponseStatus.BAD_REQUEST))
-                    .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "ID_IS_NULL"));
+                .body(new ResponseObj(ResponseStatus.BAD_REQUEST, "ID_IS_NULL"));
         }
         return ResponseEntity.ok(rateService.deleteRating(id));
     }
 
-    private boolean isNameBlank(RateDTO rateDTO) {
+    private boolean isNameBlank(RateDto rateDTO) {
         return rateDTO.getProductName().isBlank();
     }
-    private boolean isNullName(RateDTO rateDTO){
+
+    private boolean isNullName(RateDto rateDTO) {
         return rateDTO.getProductName() == null;
     }
-    private boolean isNullId(Long id){
+
+    private boolean isNullId(Long id) {
         return id == null;
     }
 }

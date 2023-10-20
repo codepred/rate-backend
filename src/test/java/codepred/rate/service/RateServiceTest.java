@@ -2,10 +2,10 @@ package codepred.rate.service;
 
 import codepred.UnitTest;
 import codepred.enums.ResponseStatus;
-import codepred.rate.dto.RateDTO;
+import codepred.rate.dto.RateDto;
+import codepred.rate.dto.ResponseObj;
 import codepred.rate.model.RateModel;
 import codepred.rate.repository.RateRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,88 +14,95 @@ import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class RateServiceTest implements UnitTest {
+
     @InjectMocks
-    RateService systemUnderTest;
+    private RateService systemUnderTest;
+
     @Mock
-    RateRepository rateRepositoryMock;
+    private RateRepository rateRepositoryMock;
+
     @Mock
-    ModelMapper modelMapperMock;
+    private ModelMapper modelMapperMock;
 
     @Nested
-    class addRatingTests {
+    class AddRatingTests {
+
         @Test
-        void givenRateDTO_whenAddRating_thenReturnResponseObjWith200andMessage() {
-            //given
-            var rateDTOmock = mock(RateDTO.class);
+        void shouldAddRating() {
+            var rateDtoMock = mock(RateDto.class);
             var rateModelMock = mock(RateModel.class);
-            when(modelMapperMock.map(rateDTOmock, RateModel.class)).thenReturn(rateModelMock);
-            //when
-            var result = systemUnderTest.addRating(rateDTOmock);
-            //then
+            when(modelMapperMock.map(rateDtoMock, RateModel.class)).thenReturn(rateModelMock);
+
+            var result = systemUnderTest.addRating(rateDtoMock);
+
             verify(rateRepositoryMock).save(rateModelMock);
-            Assertions.assertTrue(result.getCode().equals(ResponseStatus.ACCEPTED));
-            Assertions.assertTrue(result.getMessage().equals("ADDED"));
+            assertEquals(ResponseStatus.ACCEPTED, result.getCode());
+            assertEquals("ADDED", result.getMessage());
         }
     }
 
     @Nested
-    class editRatingTests {
+    class EditRatingTests {
+        private final Long id = 1L;
+        private final RateModel rateModelMock = mock(RateModel.class);
+        private final RateDto rateDtoMock = mock(RateDto.class);
+
         @Test
-        void givenExistedRate_whenEditRating_thenReturnResponseObjWith200andMessage() {
-            //given
-            Long id = 1L;
-            var rateModelMock = mock(RateModel.class);
-            var rateDTOmock = mock(RateDTO.class);
+        void shouldEditRating() {
             when(rateRepositoryMock.findById(id)).thenReturn(Optional.of(rateModelMock));
-            when(modelMapperMock.map(rateDTOmock, RateModel.class)).thenReturn(rateModelMock);
+            when(modelMapperMock.map(rateDtoMock, RateModel.class)).thenReturn(rateModelMock);
             when(rateRepositoryMock.save(rateModelMock)).thenReturn(rateModelMock);
-            //when
-            var result = systemUnderTest.editRating(id,rateDTOmock);
-            //then
+
+            var result = callService();
+
             verify(rateModelMock).setId(id);
-            Assertions.assertTrue(result.getCode().equals(ResponseStatus.ACCEPTED));
-            Assertions.assertTrue(result.getMessage().equals("EDITED"));
+            assertEquals(ResponseStatus.ACCEPTED, result.getCode());
+            assertEquals("EDITED", result.getMessage());
         }
+
         @Test
-        void whenEditRating_thenReturnResponseObjWith400andMessage() {
-            //given
-            Long id = 1L;
-            var rateDTOmock = mock(RateDTO.class);
-            //when
-            var result = systemUnderTest.editRating(id,rateDTOmock);
-            //then
-            Assertions.assertTrue(result.getCode().equals(ResponseStatus.BAD_REQUEST));
-            Assertions.assertTrue(result.getMessage().equals("ID_NOT_EXIST"));
+        void shouldNotEditRatingWhenIdNotExist() {
+            var result = callService();
+
+            assertEquals(ResponseStatus.BAD_REQUEST, result.getCode());
+            assertEquals("ID_NOT_EXIST", result.getMessage());
+        }
+
+        private ResponseObj callService() {
+            return systemUnderTest.editRating(id, rateDtoMock);
         }
     }
 
     @Nested
-    class deleteRatingTests {
+    class DeleteRatingTests {
+        private final RateModel rateModelMock = mock(RateModel.class);
+
         @Test
-        void givenExistedRate_whenDeleteRating_thenReturnResponseObjWith200andMessage() {
-            //given
-            Long id = 1L;
-            var rateModelMock = mock(RateModel.class);
+        void shouldDeleteRating() {
+            final var id = 1L;
             when(rateRepositoryMock.findById(id)).thenReturn(Optional.of(rateModelMock));
-            //when
-            var result = systemUnderTest.deleteRating(id);
-            //then
+
+            var result = callService(id);
+
             verify(rateRepositoryMock).deleteById(id);
-            Assertions.assertTrue(result.getCode().equals(ResponseStatus.ACCEPTED));
-            Assertions.assertTrue(result.getMessage().equals("DELETED"));
+            assertEquals(ResponseStatus.ACCEPTED, result.getCode());
+            assertEquals("DELETED", result.getMessage());
         }
+
         @Test
-        void whenDeleteRating_thenReturnResponseObjWith400andMessage() {
-            //given
-            Long id = 1L;
-            //when
-            var result = systemUnderTest.deleteRating(id);
-            //then
-            Assertions.assertTrue(result.getCode().equals(ResponseStatus.BAD_REQUEST));
-            Assertions.assertTrue(result.getMessage().equals("ID_NOT_EXIST"));
+        void shouldNotDeleteRatingWhenIdNotExist() {
+            var result = systemUnderTest.deleteRating(null);
+
+            assertEquals(ResponseStatus.BAD_REQUEST, result.getCode());
+            assertEquals("ID_NOT_EXIST", result.getMessage());
+        }
+
+        private ResponseObj callService(Long id) {
+            return systemUnderTest.deleteRating(id);
         }
     }
 }

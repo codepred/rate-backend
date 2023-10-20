@@ -21,7 +21,6 @@ class UserRepositoryTest {
             assertThat(5).isEqualTo(5);
         }
 
-
     }
 
 }

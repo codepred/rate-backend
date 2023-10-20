@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseObj {
-    ResponseStatus code;
-    String message;
+
+    private ResponseStatus code;
+    private String message;
+
 }
